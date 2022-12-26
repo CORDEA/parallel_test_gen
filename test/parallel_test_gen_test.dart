@@ -10,24 +10,42 @@ class MockTestRunner extends Mock implements TestRunner {}
 void main() {
   test('runTests', () async {
     final runner = MockTestRunner();
-    when(() => runner.run(path: any(named: 'path')))
+    when(() => runner.run(paths: any(named: 'paths')))
         .thenAnswer((_) => Future.value(ProcessResult(0, 0, null, null)));
 
     final stats = [
       [
-        TestFileStat('1', Duration.zero),
+        TestFileStat(
+          join('test', 'fixtures', '2', '1_test.dart'),
+          Duration.zero,
+        ),
       ],
       [
-        TestFileStat('2', Duration.zero),
-        TestFileStat('3', Duration.zero),
-        TestFileStat('4', Duration.zero),
+        TestFileStat(
+          join('test', 'fixtures', '2', '2_test.dart'),
+          Duration.zero,
+        ),
+        TestFileStat(
+          join('test', 'fixtures', '2', '4_test.dart'),
+          Duration.zero,
+        ),
       ],
     ];
 
-    await runTests(runner, stats);
+    await runTests(runner, TestStat(join('test', 'fixtures', '2'), stats));
 
-    verify(() => runner.run(path: '1'));
-    verify(() => runner.run(path: '2 3 4'));
+    verify(
+      () => runner.run(paths: [
+        join('test', 'fixtures', '2', '1_test.dart'),
+        join('test', 'fixtures', '2', '3_test.dart'),
+      ]),
+    );
+    verify(
+      () => runner.run(paths: [
+        join('test', 'fixtures', '2', '2_test.dart'),
+        join('test', 'fixtures', '2', '4_test.dart'),
+      ]),
+    );
   });
 
   test('listTestStats', () async {
@@ -58,14 +76,16 @@ void main() {
     ];
 
     test('with concurrent is 1', () {
-      final result = optimize(stats, concurrent: 1);
+      final result =
+          optimize(path: 'path', stats: stats, concurrent: 1).fileStats;
 
       expect(result, hasLength(1));
       expect(result[0], hasLength(10));
     });
 
     test('with concurrent is 3', () {
-      final result = optimize(stats, concurrent: 3);
+      final result =
+          optimize(path: 'path', stats: stats, concurrent: 3).fileStats;
 
       expect(result, hasLength(3));
 
@@ -84,7 +104,8 @@ void main() {
     });
 
     test('with concurrent is 10', () {
-      final result = optimize(stats, concurrent: 10);
+      final result =
+          optimize(path: 'path', stats: stats, concurrent: 10).fileStats;
 
       expect(result, hasLength(10));
     });
@@ -92,7 +113,7 @@ void main() {
     test('with concurrent is 11', () {
       var hasError = false;
       try {
-        optimize(stats, concurrent: 11);
+        optimize(path: 'path', stats: stats, concurrent: 11);
       } catch (_) {
         hasError = true;
       }

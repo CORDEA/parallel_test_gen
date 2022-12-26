@@ -4,26 +4,30 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 
 class TestRunner {
-  Future<ProcessResult> run({required String path}) =>
-      Process.run('dart', ['test', path]);
+  Future<ProcessResult> run({required List<String> paths}) =>
+      Process.run('dart', ['test', paths.join(' ')]);
 }
 
 int calculate() {
   return 6 * 7;
 }
 
-Future<void> runTests(
-  TestRunner runner,
-  List<List<TestFileStat>> stats,
-) async {
-  final process = stats
-      .map((e) => e.map((e) => e.path).join(' '))
-      .map((e) => runner.run(path: e));
-  await Future.wait(process);
+Future<void> runTests(TestRunner runner, TestStat stat) async {
+  final group = stat.fileStats
+      .map((e) => e.map((e) => e.path).toList())
+      .toList(growable: false);
+  final current =
+      (await _listFiles(path: stat.path)).map((e) => e.path).toSet();
+  final diff = current.difference(group.expand((e) => e).toSet());
+  for (int i = 0; i < diff.length; i++) {
+    group[i % group.length].add(diff.elementAt(i));
+  }
+  await Future.wait(group.map((e) => runner.run(paths: e)));
 }
 
-List<List<TestFileStat>> optimize(
-  List<TestFileStat> stats, {
+TestStat optimize({
+  required String path,
+  required List<TestFileStat> stats,
   required int concurrent,
 }) {
   if (concurrent > stats.length) {
@@ -52,7 +56,7 @@ List<List<TestFileStat>> optimize(
     group[index].add(f);
     durations[index] += f.duration;
   }
-  return group;
+  return TestStat(path, group);
 }
 
 Future<List<TestFileStat>> listTestStats(
@@ -64,7 +68,7 @@ Future<List<TestFileStat>> listTestStats(
   final result = <TestFileStat>[];
   for (final file in files) {
     stopwatch.start();
-    final r = await runner.run(path: file.path);
+    final r = await runner.run(paths: [file.path]);
     final err = r.stderr;
     if (err is String && err.isNotEmpty) {
       stopwatch.reset();
@@ -84,6 +88,13 @@ Future<List<FileSystemEntity>> _listFiles({required String path}) {
       .list(recursive: true)
       .where((e) => e.uri.pathSegments.last.endsWith('_test.dart'))
       .toList();
+}
+
+class TestStat {
+  const TestStat(this.path, this.fileStats);
+
+  final String path;
+  final List<List<TestFileStat>> fileStats;
 }
 
 class TestFileStat {
