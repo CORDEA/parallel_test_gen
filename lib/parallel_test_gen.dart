@@ -3,8 +3,23 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 
+class TestRunner {
+  Future<ProcessResult> run({required String path}) =>
+      Process.run('dart', ['test', path]);
+}
+
 int calculate() {
   return 6 * 7;
+}
+
+Future<void> runTests(
+  TestRunner runner,
+  List<List<TestFileStat>> stats,
+) async {
+  final process = stats
+      .map((e) => e.map((e) => e.path).join(' '))
+      .map((e) => runner.run(path: e));
+  await Future.wait(process);
 }
 
 List<List<TestFileStat>> optimize(
@@ -40,13 +55,16 @@ List<List<TestFileStat>> optimize(
   return group;
 }
 
-Future<List<TestFileStat>> listTestStats({required String path}) async {
+Future<List<TestFileStat>> listTestStats(
+  TestRunner runner, {
+  required String path,
+}) async {
   final files = await _listFiles(path: path);
   final stopwatch = Stopwatch();
   final result = <TestFileStat>[];
   for (final file in files) {
     stopwatch.start();
-    final r = await Process.run('dart', ['test', file.path]);
+    final r = await runner.run(path: file.path);
     final err = r.stderr;
     if (err is String && err.isNotEmpty) {
       stopwatch.reset();

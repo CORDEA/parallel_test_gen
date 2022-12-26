@@ -1,11 +1,38 @@
+import 'dart:io';
+
+import 'package:mocktail/mocktail.dart';
 import 'package:parallel_test_gen/parallel_test_gen.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 
+class MockTestRunner extends Mock implements TestRunner {}
+
 void main() {
+  test('runTests', () async {
+    final runner = MockTestRunner();
+    when(() => runner.run(path: any(named: 'path')))
+        .thenAnswer((_) => Future.value(ProcessResult(0, 0, null, null)));
+
+    final stats = [
+      [
+        TestFileStat('1', Duration.zero),
+      ],
+      [
+        TestFileStat('2', Duration.zero),
+        TestFileStat('3', Duration.zero),
+        TestFileStat('4', Duration.zero),
+      ],
+    ];
+
+    await runTests(runner, stats);
+
+    verify(() => runner.run(path: '1'));
+    verify(() => runner.run(path: '2 3 4'));
+  });
+
   test('listTestStats', () async {
     final path = join('test', 'fixtures', '1');
-    final result = await listTestStats(path: path);
+    final result = await listTestStats(TestRunner(), path: path);
 
     expect(result, hasLength(3));
     expect(result[0].path, join('test', 'fixtures', '1', '1_test.dart'));
