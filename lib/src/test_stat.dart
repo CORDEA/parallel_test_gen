@@ -4,8 +4,13 @@ part 'test_stat.g.dart';
 
 @JsonSerializable()
 class TestFileStat {
-  const TestFileStat(this.path, this.duration);
+  const TestFileStat({
+    required this.id,
+    required this.path,
+    required this.duration,
+  });
 
+  final String id;
   final String path;
   final Duration duration;
 

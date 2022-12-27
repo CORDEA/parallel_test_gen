@@ -18,18 +18,21 @@ void main() {
     final stats = [
       [
         TestFileStat(
-          join('test', 'fixtures', '2', '1_test.dart'),
-          Duration.zero,
+          id: '',
+          path: join('test', 'fixtures', '2', '1_test.dart'),
+          duration: Duration.zero,
         ),
       ],
       [
         TestFileStat(
-          join('test', 'fixtures', '2', '2_test.dart'),
-          Duration.zero,
+          id: '',
+          path: join('test', 'fixtures', '2', '2_test.dart'),
+          duration: Duration.zero,
         ),
         TestFileStat(
-          join('test', 'fixtures', '2', '4_test.dart'),
-          Duration.zero,
+          id: '',
+          path: join('test', 'fixtures', '2', '4_test.dart'),
+          duration: Duration.zero,
         ),
       ],
     ];
@@ -72,16 +75,56 @@ void main() {
 
   group('optimize', () {
     final stats = [
-      TestFileStat('1', Duration(seconds: 1)),
-      TestFileStat('2', Duration(seconds: 4)),
-      TestFileStat('3', Duration(seconds: 5)),
-      TestFileStat('4', Duration(seconds: 6)),
-      TestFileStat('5', Duration(seconds: 8)),
-      TestFileStat('6', Duration(seconds: 5)),
-      TestFileStat('7', Duration(seconds: 10)),
-      TestFileStat('8', Duration(seconds: 2)),
-      TestFileStat('9', Duration(seconds: 6)),
-      TestFileStat('10', Duration(seconds: 7)),
+      TestFileStat(
+        id: 'id1',
+        path: 'path1',
+        duration: Duration(seconds: 1),
+      ),
+      TestFileStat(
+        id: 'id2',
+        path: 'path2',
+        duration: Duration(seconds: 4),
+      ),
+      TestFileStat(
+        id: 'id3',
+        path: 'path3',
+        duration: Duration(seconds: 5),
+      ),
+      TestFileStat(
+        id: 'id4',
+        path: 'path4',
+        duration: Duration(seconds: 6),
+      ),
+      TestFileStat(
+        id: 'id5',
+        path: 'path5',
+        duration: Duration(seconds: 8),
+      ),
+      TestFileStat(
+        id: 'id6',
+        path: 'path6',
+        duration: Duration(seconds: 5),
+      ),
+      TestFileStat(
+        id: 'id7',
+        path: 'path7',
+        duration: Duration(seconds: 10),
+      ),
+      TestFileStat(
+        id: 'id8',
+        path: 'path8',
+        duration: Duration(seconds: 2),
+      ),
+      TestFileStat(
+        id: 'id9',
+        path: 'path9',
+        duration: Duration(seconds: 6),
+      ),
+      TestFileStat(
+        id: 'id10',
+        path: 'path10',
+        duration: Duration(seconds: 7),
+      ),
     ];
 
     test('with concurrency is 1', () {
@@ -100,18 +143,20 @@ void main() {
 
       final statsResult = result.fileStats;
       expect(statsResult, hasLength(3));
-      expect(statsResult[0][0].path, '7'); // 10
-      expect(statsResult[0][1].path, '3'); // 15
-      expect(statsResult[0][2].path, '8'); // 17
-      expect(statsResult[0][3].path, '1'); // 18
+      expect(statsResult[0][0].id, 'id7'); // 10
+      expect(statsResult[0][0].path, 'path7');
+      expect(statsResult[0][1].id, 'id3'); // 15
+      expect(statsResult[0][1].path, 'path3');
+      expect(statsResult[0][2].id, 'id8'); // 17
+      expect(statsResult[0][3].id, 'id1'); // 18
 
-      expect(statsResult[1][0].path, '5'); // 8
-      expect(statsResult[1][1].path, '9'); // 14
-      expect(statsResult[1][2].path, '2'); // 18
+      expect(statsResult[1][0].id, 'id5'); // 8
+      expect(statsResult[1][1].id, 'id9'); // 14
+      expect(statsResult[1][2].id, 'id2'); // 18
 
-      expect(statsResult[2][0].path, '10'); // 7
-      expect(statsResult[2][1].path, '4'); // 13
-      expect(statsResult[2][2].path, '6'); // 18
+      expect(statsResult[2][0].id, 'id10'); // 7
+      expect(statsResult[2][1].id, 'id4'); // 13
+      expect(statsResult[2][2].id, 'id6'); // 18
     });
 
     test('with concurrency is 10', () {

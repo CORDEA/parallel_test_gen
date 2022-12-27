@@ -7,12 +7,14 @@ part of 'test_stat.dart';
 // **************************************************************************
 
 TestFileStat _$TestFileStatFromJson(Map<String, dynamic> json) => TestFileStat(
-      json['path'] as String,
-      Duration(microseconds: json['duration'] as int),
+      id: json['id'] as String,
+      path: json['path'] as String,
+      duration: Duration(microseconds: json['duration'] as int),
     );
 
 Map<String, dynamic> _$TestFileStatToJson(TestFileStat instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'path': instance.path,
       'duration': instance.duration.inMicroseconds,
     };

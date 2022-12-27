@@ -2,9 +2,12 @@ import 'dart:collection';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:uuid/uuid.dart';
 
 import 'runner.dart';
 import 'test_stat.dart';
+
+const uuid = Uuid();
 
 TestStat optimize({
   required String path,
@@ -60,8 +63,9 @@ Future<List<TestFileStat>> listTestStats(
       throw Exception(err);
     }
     result.add(TestFileStat(
-      file.path,
-      stopwatch.elapsed,
+      id: uuid.v4(),
+      path: file.path,
+      duration: stopwatch.elapsed,
     ));
     stopwatch.reset();
   }
