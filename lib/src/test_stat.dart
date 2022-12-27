@@ -1,7 +1,12 @@
 class TestStat {
-  const TestStat(this.path, this.fileStats);
+  const TestStat({
+    required this.path,
+    required this.concurrency,
+    required this.fileStats,
+  });
 
   final String path;
+  final int concurrency;
   final List<List<TestFileStat>> fileStats;
 }
 

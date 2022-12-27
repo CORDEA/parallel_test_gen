@@ -37,7 +37,11 @@ TestStat optimize({
     group[index].add(f);
     durations[index] += f.duration;
   }
-  return TestStat(path, group);
+  return TestStat(
+    path: path,
+    concurrency: concurrency,
+    fileStats: group,
+  );
 }
 
 Future<List<TestFileStat>> listTestStats(

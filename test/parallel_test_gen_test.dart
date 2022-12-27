@@ -34,7 +34,14 @@ void main() {
       ],
     ];
 
-    await runTests(runner, TestStat(join('test', 'fixtures', '2'), stats));
+    await runTests(
+      runner,
+      TestStat(
+        path: join('test', 'fixtures', '2'),
+        concurrency: 0,
+        fileStats: stats,
+      ),
+    );
 
     verify(
       () => runner.run(paths: [
@@ -78,31 +85,33 @@ void main() {
     ];
 
     test('with concurrency is 1', () {
-      final result =
-          optimize(path: 'path', stats: stats, concurrency: 1).fileStats;
+      final result = optimize(path: 'path', stats: stats, concurrency: 1);
 
-      expect(result, hasLength(1));
-      expect(result[0], hasLength(10));
+      expect(result.concurrency, 1);
+
+      expect(result.fileStats, hasLength(1));
+      expect(result.fileStats[0], hasLength(10));
     });
 
     test('with concurrency is 3', () {
-      final result =
-          optimize(path: 'path', stats: stats, concurrency: 3).fileStats;
+      final result = optimize(path: 'path', stats: stats, concurrency: 3);
 
-      expect(result, hasLength(3));
+      expect(result.concurrency, 3);
 
-      expect(result[0][0].path, '7'); // 10
-      expect(result[0][1].path, '3'); // 15
-      expect(result[0][2].path, '8'); // 17
-      expect(result[0][3].path, '1'); // 18
+      final statsResult = result.fileStats;
+      expect(statsResult, hasLength(3));
+      expect(statsResult[0][0].path, '7'); // 10
+      expect(statsResult[0][1].path, '3'); // 15
+      expect(statsResult[0][2].path, '8'); // 17
+      expect(statsResult[0][3].path, '1'); // 18
 
-      expect(result[1][0].path, '5'); // 8
-      expect(result[1][1].path, '9'); // 14
-      expect(result[1][2].path, '2'); // 18
+      expect(statsResult[1][0].path, '5'); // 8
+      expect(statsResult[1][1].path, '9'); // 14
+      expect(statsResult[1][2].path, '2'); // 18
 
-      expect(result[2][0].path, '10'); // 7
-      expect(result[2][1].path, '4'); // 13
-      expect(result[2][2].path, '6'); // 18
+      expect(statsResult[2][0].path, '10'); // 7
+      expect(statsResult[2][1].path, '4'); // 13
+      expect(statsResult[2][2].path, '6'); // 18
     });
 
     test('with concurrency is 10', () {
