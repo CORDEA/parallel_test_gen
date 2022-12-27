@@ -77,17 +77,17 @@ void main() {
       TestFileStat('10', Duration(seconds: 7)),
     ];
 
-    test('with concurrent is 1', () {
+    test('with concurrency is 1', () {
       final result =
-          optimize(path: 'path', stats: stats, concurrent: 1).fileStats;
+          optimize(path: 'path', stats: stats, concurrency: 1).fileStats;
 
       expect(result, hasLength(1));
       expect(result[0], hasLength(10));
     });
 
-    test('with concurrent is 3', () {
+    test('with concurrency is 3', () {
       final result =
-          optimize(path: 'path', stats: stats, concurrent: 3).fileStats;
+          optimize(path: 'path', stats: stats, concurrency: 3).fileStats;
 
       expect(result, hasLength(3));
 
@@ -105,17 +105,17 @@ void main() {
       expect(result[2][2].path, '6'); // 18
     });
 
-    test('with concurrent is 10', () {
+    test('with concurrency is 10', () {
       final result =
-          optimize(path: 'path', stats: stats, concurrent: 10).fileStats;
+          optimize(path: 'path', stats: stats, concurrency: 10).fileStats;
 
       expect(result, hasLength(10));
     });
 
-    test('with concurrent is 11', () {
+    test('with concurrency is 11', () {
       var hasError = false;
       try {
-        optimize(path: 'path', stats: stats, concurrent: 11);
+        optimize(path: 'path', stats: stats, concurrency: 11);
       } catch (_) {
         hasError = true;
       }

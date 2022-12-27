@@ -9,9 +9,9 @@ import 'test_stat.dart';
 TestStat optimize({
   required String path,
   required List<TestFileStat> stats,
-  required int concurrent,
+  required int concurrency,
 }) {
-  if (concurrent > stats.length) {
+  if (concurrency > stats.length) {
     throw Exception();
   }
   final sorted = Queue<TestFileStat>.from(
@@ -19,7 +19,7 @@ TestStat optimize({
   );
   final group = <List<TestFileStat>>[];
   final durations = <Duration>[];
-  for (int i = 0; i < concurrent; i++) {
+  for (int i = 0; i < concurrency; i++) {
     final f = sorted.removeFirst();
     group.add([f]);
     durations.add(f.duration);
@@ -28,7 +28,7 @@ TestStat optimize({
     var index = 0;
     final f = sorted.removeFirst();
     var min = Duration(days: 1);
-    for (int i = 0; i < concurrent; i++) {
+    for (int i = 0; i < concurrency; i++) {
       if (min > durations[i]) {
         min = durations[i];
         index = i;
