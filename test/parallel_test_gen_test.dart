@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:mocktail/mocktail.dart';
 import 'package:parallel_test_gen/parallel_test_gen.dart';
+import 'package:parallel_test_gen/src/runner.dart';
+import 'package:parallel_test_gen/src/test_stat.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 
