@@ -1,3 +1,21 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'test_stat.g.dart';
+
+@JsonSerializable()
+class TestFileStat {
+  const TestFileStat(this.path, this.duration);
+
+  final String path;
+  final Duration duration;
+
+  factory TestFileStat.fromJson(Map<String, dynamic> json) =>
+      _$TestFileStatFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TestFileStatToJson(this);
+}
+
+@JsonSerializable()
 class TestStat {
   const TestStat({
     required this.path,
@@ -8,11 +26,9 @@ class TestStat {
   final String path;
   final int concurrency;
   final List<List<TestFileStat>> fileStats;
-}
 
-class TestFileStat {
-  const TestFileStat(this.path, this.duration);
+  factory TestStat.fromJson(Map<String, dynamic> json) =>
+      _$TestStatFromJson(json);
 
-  final String path;
-  final Duration duration;
+  Map<String, dynamic> toJson() => _$TestStatToJson(this);
 }
