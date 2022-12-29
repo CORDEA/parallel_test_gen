@@ -10,7 +10,7 @@ import 'test_stat.dart';
 const uuid = Uuid();
 
 TestStat optimize({
-  required String path,
+  required Directory directory,
   required List<TestFileStat> stats,
   required int concurrency,
 }) {
@@ -41,17 +41,17 @@ TestStat optimize({
     durations[index] += f.duration;
   }
   return TestStat(
-    path: path,
+    path: directory.path,
     concurrency: concurrency,
     fileStats: group,
   );
 }
 
 Future<List<TestFileStat>> listTestStats(
-  TestRunner runner, {
-  required String path,
-}) async {
-  final files = await listFiles(path: path);
+  TestRunner runner,
+  Directory directory,
+) async {
+  final files = await listFiles(directory);
   final stopwatch = Stopwatch();
   final result = <TestFileStat>[];
   for (final file in files) {
@@ -72,8 +72,8 @@ Future<List<TestFileStat>> listTestStats(
   return result;
 }
 
-Future<List<FileSystemEntity>> listFiles({required String path}) {
-  return Directory(path)
+Future<List<FileSystemEntity>> listFiles(Directory directory) {
+  return directory
       .list(recursive: true)
       .where((e) => e.uri.pathSegments.last.endsWith('_test.dart'))
       .toList();

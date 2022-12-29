@@ -61,16 +61,32 @@ void main() {
   });
 
   test('listTestStats', () async {
-    final path = join('test', 'fixtures', '1');
-    final result = await listTestStats(TestRunner(), path: path);
+    final directory = Directory(join('test', 'fixtures', '1'));
+    final result = await listTestStats(TestRunner(), directory);
 
     expect(result, hasLength(3));
-    expect(result[0].path, join('test', 'fixtures', '1', '1_test.dart'));
-    expect(result[0].duration, isNot(Duration.zero));
-    expect(result[1].path, join('test', 'fixtures', '1', '2_test.dart'));
-    expect(result[1].duration, isNot(Duration.zero));
-    expect(result[2].path, join('test', 'fixtures', '1', '3_test.dart'));
-    expect(result[2].duration, isNot(Duration.zero));
+    expect(
+      result.indexWhere(
+        (e) => e.path == join('test', 'fixtures', '1', '1_test.dart'),
+      ),
+      isNot(-1),
+    );
+    expect(
+      result.indexWhere(
+        (e) => e.path == join('test', 'fixtures', '1', '2_test.dart'),
+      ),
+      isNot(-1),
+    );
+    expect(
+      result.indexWhere(
+        (e) => e.path == join('test', 'fixtures', '1', '3_test.dart'),
+      ),
+      isNot(-1),
+    );
+    for (final e in result) {
+      expect(e.id, isNotEmpty);
+      expect(e.duration, isNot(Duration.zero));
+    }
   });
 
   group('optimize', () {
@@ -128,7 +144,11 @@ void main() {
     ];
 
     test('with concurrency is 1', () {
-      final result = optimize(path: 'path', stats: stats, concurrency: 1);
+      final result = optimize(
+        directory: Directory('path'),
+        stats: stats,
+        concurrency: 1,
+      );
 
       expect(result.concurrency, 1);
 
@@ -137,7 +157,11 @@ void main() {
     });
 
     test('with concurrency is 3', () {
-      final result = optimize(path: 'path', stats: stats, concurrency: 3);
+      final result = optimize(
+        directory: Directory('path'),
+        stats: stats,
+        concurrency: 3,
+      );
 
       expect(result.concurrency, 3);
 
@@ -160,8 +184,11 @@ void main() {
     });
 
     test('with concurrency is 10', () {
-      final result =
-          optimize(path: 'path', stats: stats, concurrency: 10).fileStats;
+      final result = optimize(
+        directory: Directory('path'),
+        stats: stats,
+        concurrency: 10,
+      ).fileStats;
 
       expect(result, hasLength(10));
     });
@@ -169,7 +196,11 @@ void main() {
     test('with concurrency is 11', () {
       var hasError = false;
       try {
-        optimize(path: 'path', stats: stats, concurrency: 11);
+        optimize(
+          directory: Directory('path'),
+          stats: stats,
+          concurrency: 11,
+        );
       } catch (_) {
         hasError = true;
       }

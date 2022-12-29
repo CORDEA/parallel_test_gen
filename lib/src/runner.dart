@@ -12,7 +12,8 @@ Future<void> runTests(TestRunner runner, TestStat stat) async {
   final group = stat.fileStats
       .map((e) => e.map((e) => e.path).toList())
       .toList(growable: false);
-  final current = (await listFiles(path: stat.path)).map((e) => e.path).toSet();
+  final current =
+      (await listFiles(Directory(stat.path))).map((e) => e.path).toSet();
   final diff = current.difference(group.expand((e) => e).toSet());
   for (int i = 0; i < diff.length; i++) {
     group[i % group.length].add(diff.elementAt(i));
