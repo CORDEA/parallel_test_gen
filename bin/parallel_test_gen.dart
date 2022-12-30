@@ -4,9 +4,11 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:parallel_test_gen/parallel_test_gen.dart';
 import 'package:parallel_test_gen/src/runner.dart';
+import 'package:parallel_test_gen/src/test_stat.dart';
 import 'package:path/path.dart';
 
 const _configFile = 'test_config.json';
+const runner = TestRunner();
 
 void main(List<String> arguments) {
   final parser = ArgParser();
@@ -16,7 +18,6 @@ void main(List<String> arguments) {
 
   final test = parser.addCommand('test');
   test.addOption('config');
-  test.addOption('id');
 
   final result = parser.parse(arguments);
   final command = result.command;
@@ -30,12 +31,12 @@ void main(List<String> arguments) {
       _check(command);
       break;
     case 'test':
+      _test(command);
       break;
   }
 }
 
 Future<void> _check(ArgResults results) async {
-  final runner = TestRunner();
   final directory =
       results.rest.isEmpty ? Directory.current : Directory(results.rest.first);
   final stats = await listTestStats(runner, directory);
@@ -47,4 +48,12 @@ Future<void> _check(ArgResults results) async {
   final json = jsonEncode(result);
   final file = File(join(directory.path, _configFile));
   await file.writeAsString(json);
+}
+
+Future<void> _test(ArgResults results) async {
+  final path =
+      results['config'] ?? File(join(Directory.current.path, _configFile));
+  final id = results.rest.first;
+  final config = TestStat.fromJson(jsonDecode(await File(path).readAsString()));
+  await runTests(runner: runner, stat: config, id: id);
 }

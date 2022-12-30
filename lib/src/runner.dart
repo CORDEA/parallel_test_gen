@@ -4,8 +4,10 @@ import 'reader.dart';
 import 'test_stat.dart';
 
 class TestRunner {
+  const TestRunner();
+
   Future<ProcessResult> run({required Iterable<String> paths}) =>
-      Process.run('dart', ['test', paths.join(' ')]);
+      Process.run('dart', ['test', ...paths]);
 }
 
 Future<void> runTests({
