@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'reader.dart';
@@ -27,7 +28,13 @@ Future<void> runTests({
         .fileStats
         .add(TestFileStat(path: diff.elementAt(i), duration: Duration.zero));
   }
-  await runner.run(
+  final result = await runner.run(
     paths: groups.firstWhere((e) => e.id == id).fileStats.map((e) => e.path),
   );
+  if (result.stdout != null) {
+    stdout.add(utf8.encode(result.stdout));
+  }
+  if (result.stderr != null) {
+    stderr.add(utf8.encode(result.stderr));
+  }
 }
