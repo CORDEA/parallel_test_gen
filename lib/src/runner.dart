@@ -4,19 +4,28 @@ import 'reader.dart';
 import 'test_stat.dart';
 
 class TestRunner {
-  Future<ProcessResult> run({required List<String> paths}) =>
+  Future<ProcessResult> run({required Iterable<String> paths}) =>
       Process.run('dart', ['test', paths.join(' ')]);
 }
 
-Future<void> runTests(TestRunner runner, TestStat stat) async {
-  final group = stat.fileStats
-      .map((e) => e.map((e) => e.path).toList())
-      .toList(growable: false);
+Future<void> runTests({
+  required TestRunner runner,
+  required TestStat stat,
+  required String id,
+}) async {
   final current =
       (await listFiles(Directory(stat.path))).map((e) => e.path).toSet();
-  final diff = current.difference(group.expand((e) => e).toSet());
+  final diff = current.difference(stat.groups
+      .map((e) => e.fileStats.map((e) => e.path))
+      .expand((e) => e)
+      .toSet());
+  final groups = stat.groups;
   for (int i = 0; i < diff.length; i++) {
-    group[i % group.length].add(diff.elementAt(i));
+    groups[i % groups.length]
+        .fileStats
+        .add(TestFileStat(path: diff.elementAt(i), duration: Duration.zero));
   }
-  await Future.wait(group.map((e) => runner.run(paths: e)));
+  await runner.run(
+    paths: groups.firstWhere((e) => e.id == id).fileStats.map((e) => e.path),
+  );
 }

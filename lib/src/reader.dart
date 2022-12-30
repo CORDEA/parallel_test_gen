@@ -43,7 +43,7 @@ TestStat optimize({
   return TestStat(
     path: directory.path,
     concurrency: concurrency,
-    fileStats: group,
+    groups: group.map((e) => TestFileStatGroup(uuid.v4(), e)).toList(),
   );
 }
 
@@ -63,7 +63,6 @@ Future<List<TestFileStat>> listTestStats(
       throw Exception(err);
     }
     result.add(TestFileStat(
-      id: uuid.v4(),
       path: file.path,
       duration: stopwatch.elapsed,
     ));
